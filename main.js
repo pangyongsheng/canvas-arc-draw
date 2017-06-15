@@ -4,7 +4,7 @@ var Draw={
     this.cObj=document.getElementById("canvas").getContext("2d");
     this.pathr=120; //滑动路径半径
     this.event();   //初始化事件
-    this.draw.prototype=this; //draw继承父元素方法
+    this.draw.prototype=this; //draw继承Draw方法
     this.p=new this.draw(112,284,18);  //创建实例p
    },
    draw:function(x,y,r,j){  //绘图
@@ -34,11 +34,11 @@ var Draw={
       this.cObj.fillStyle='#f15a4a';
       this.cObj.fill();
 
-      this.cObj.beginPath();
-      this.cObj.moveTo(200,200);
-      this.cObj.arc(x,y,8,0,Math.PI*2,false); // 绘制滑块外侧
-      this.cObj.fillStyle='#ffffff';
-      this.cObj.fill();
+      //this.cObj.beginPath();
+      //this.cObj.moveTo(200,200);
+      //this.cObj.arc(x,y,8,0,Math.PI*2,false); // 绘制滑块外侧
+      //this.cObj.fillStyle='#ffffff';
+      //this.cObj.fill();
 
       this.cObj.beginPath();
       this.cObj.arc(200,200,120,Math.PI*0.75,this.j,false); // 可变圆弧
