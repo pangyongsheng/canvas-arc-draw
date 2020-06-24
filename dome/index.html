@@ -1,0 +1,29 @@
+<!--
+ * @Author       : your name
+ * @Date         : 2020-06-22 17:22:25
+ * @LastEditTime : 2020-06-23 17:18:37
+ * @LastEditors  : Please set LastEditors
+ * @Description  : In User Settings Edit
+ * @FilePath     : \drag-arc\dome\index.html
+--> 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+</head>
+<body onload="main()">
+    <div id="content"></div>
+</body>
+<script src="../dist/drag-arc.min.js"></script>
+<script>
+    function main(){
+        console.log(dragArc)
+        const dom = document.getElementById("content")
+        const a = new dragArc({
+            el: dom
+        })
+    }
+</script>
+</html>
