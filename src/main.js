@@ -9,15 +9,15 @@
 class DragAcr {
   constructor(param) {
     this.initParam(param)
-    this.draw(10)
+    this.draw(30)
   }
   initParam(param) {
     const {
       el,
       startDeg = 0,
-      endDeg = 1,
-      innerColor = "#c0c0c0",
-      outColor = "#0078b4",
+      endDeg = 1.8,
+      innerColor = "#0078b4",
+      outColor = "#c0c0c0",
       innerLineWidth = 1,
       outLineWidth = 20,
       counterclockwise = true,
@@ -35,8 +35,8 @@ class DragAcr {
     this.radius = this.width / 3; //滑动路径半径
     this.initCanvas(el);
 
-    this.startDeg = 2 - startDeg;
-    this.endDeg = 2 - endDeg;
+    this.startDeg = startDeg;
+    this.endDeg = endDeg;
     this.innerColor = innerColor;
     this.outColor = outColor;
     this.innerLineWidth = innerLineWidth;
@@ -59,47 +59,46 @@ class DragAcr {
     this.canvas.setAttribute("height", this.width);
     dom.appendChild(this.canvas);
     this.ctx = this.canvas.getContext("2d");
-    console.log(this.ctx)
+    //console.log(this.ctx)
   }
   //绘图
   draw(value) {
     this.ctx.clearRect(0, 0, this.width, this.width);
-    // j = j || 0.75 * Math.PI;
+
     this.ctx.save();
 
-    this.rotate && this.ctx.translate(this.center, this.center);
-    this.rotate && this.ctx.rotate(Math.PI * this.rotate);
-    this.rotate && this.ctx.translate(-this.center, -this.center);
+    let startDeg = this.counterclockwise ? Math.PI * (2 - this.startDeg) : Math.PI * this.startDeg
+    let endDeg = this.counterclockwise ? Math.PI * (2 - this.endDeg) : Math.PI * this.endDeg
 
     // 绘制内层圆弧
     this.ctx.beginPath();
     this.ctx.lineWidth = 1;
-    this.ctx.arc(this.center, this.center, this.radius - 20, Math.PI * this.startDeg, Math.PI * this.endDeg, this.counterclockwise); // 绘制内层圆弧
-    this.ctx.strokeStyle = '#0078b4';
+    this.ctx.arc(this.center, this.center, this.radius - 20, startDeg, endDeg, this.counterclockwise); // 绘制内层圆弧
+    this.ctx.strokeStyle = this.innerColor;
     this.ctx.stroke();
 
     // 绘制外侧圆弧
     this.ctx.beginPath();
-    this.ctx.arc(this.center, this.center, this.radius, Math.PI * this.startDeg, Math.PI * this.endDeg, this.counterclockwise); // 绘制外侧圆弧
-    this.ctx.strokeStyle = '#c0c0c0';
+    this.ctx.arc(this.center, this.center, this.radius, startDeg, endDeg, this.counterclockwise); // 绘制外侧圆弧
+    this.ctx.strokeStyle = this.outColor;
     this.ctx.lineCap = "round";
     this.ctx.lineWidth = 20;
     this.ctx.stroke();
 
-    let Deg = this.transDeg(value)
+    let Deg = this.valToDeg(value)
 
     //console.log(Deg)
 
     // 绘制可变圆弧
     this.ctx.beginPath();
-    this.ctx.arc(this.center, this.center, this.radius, Math.PI * this.startDeg, Deg, this.counterclockwise); // 可变圆弧
+    this.ctx.arc(this.center, this.center, this.radius, startDeg, Deg, this.counterclockwise); // 可变圆弧
     this.ctx.strokeStyle = '#f15a4a';
     this.ctx.lineCap = "round";
     this.ctx.lineWidth = 20;
     this.ctx.stroke();
 
     // 绘制滑块
-    this.P = this.DegXY(Deg)
+    this.P = this.DegToXY(Deg)
     this.ctx.beginPath();
     this.ctx.moveTo(200, 200);
     this.ctx.arc(this.P.x, this.P.y, this.slider + 5, 0, Math.PI * 2, false); // 绘制滑块内侧
@@ -112,18 +111,23 @@ class DragAcr {
     this.ctx.fill();
 
   }
-  transDeg(v) {
-    let range = this.startDeg - this.endDeg;
+  //将值转化为弧度
+  valToDeg(v) {
+    let range = this.endDeg - this.startDeg;
     let val = range / 100 * v;
-    return (this.startDeg - val) * Math.PI;
+    if(this.counterclockwise) val = 2 -val;
+    let startDeg = this.counterclockwise ? (2 - this.startDeg) : this.startDeg;
+    return (startDeg + val) * Math.PI;
   }
-  DegXY(deg) {
+  // 弧度转化为对应坐标值
+  DegToXY(deg) {
     let d = 2 * Math.PI - deg;
     return this.respotchangeXY({
       x: this.radius * Math.cos(d),
       y: this.radius * Math.sin(d)
     })
   }
+
   //canvas坐标转化为中心坐标
   spotchangeXY(point) {
     const spotchangeX = (i) => {
@@ -157,30 +161,33 @@ class DragAcr {
     dom.addEventListener("mouseup", this.OnMouseUp.bind(this), false);
   }
   OnMouseMove(evt) { //
-    
-    if(!this.isDown) return;
-    
-    console.log('move')
-      let evpoint = {};
-      evpoint.x = this.getx(evt);
-      evpoint.y = this.gety(evt);
-      let point = this.spotchangeXY(evpoint);
-      console.log(point)
-      let deg = this.getDeg(point.x, point.y);
 
-      //console.log(deg)
-      this.draw(deg)
+    if (!this.isDown) return;
+
+    // console.log('move')
+    let evpoint = {};
+    evpoint.x = this.getx(evt);
+    evpoint.y = this.gety(evt);
+    let point = this.spotchangeXY(evpoint);
+    // console.log(point)
+    let deg = this.XYToDeg(point.x, point.y);
+    deg = this.counterclockwise ? deg : Math.PI * 2 - deg;
+    let val = (deg/ Math.PI - this.startDeg) /(this.endDeg - this.startDeg)  * 100
+    if(val>100 || val<0) return;
+    this.draw(val)
   }
   OnMouseDown(evt) {
     console.log('down');
     let X = this.getx(evt);
     let Y = this.gety(evt);
-    let minX = this.P.x - this.slider;
-    let maxX = this.P.x + this.slider;
-    let minY = this.P.y - this.slider;
-    let maxY = this.P.y + this.slider;
+    let P = this.P 
+    // console.log(P)
+    // console.log(X,Y)
+    let minX = P.x - this.slider;
+    let maxX = P.x + this.slider;
+    let minY = P.y - this.slider;
+    let maxY = P.y + this.slider;
     if (minX < X && X < maxX && minY < Y && Y < maxY) {   //判断鼠标是否在滑块上 
-      console.log("in slide")
       this.isDown = true;
     } else {
       this.isDown = false;
@@ -189,45 +196,46 @@ class DragAcr {
   OnMouseUp() {  //鼠标释放
     this.isDown = false
   }
-  getDeg(lx,ly) {
-    console.log(lx,ly)
-    console.log(ly/lx)
-    let adeg =  Math.atan(ly/lx)
-    console.log(adeg)
+  // 将坐标点转化为弧度
+  XYToDeg(lx, ly) {
+    let adeg = Math.atan(ly / lx)
     let deg;
-    if(lx>=0 && ly>=0){
+    if (lx >= 0 && ly >= 0) {
       deg = adeg;
     }
-    if(lx<=0 && ly>=0){
-      deg =  adeg + Math.PI;
+    if (lx <= 0 && ly >= 0) {
+      deg = adeg + Math.PI;
     }
-    if(lx<=0 && ly<=0){
-      deg =  adeg + Math.PI;
+    if (lx <= 0 && ly <= 0) {
+      deg = adeg + Math.PI;
     }
-    if(lx>=0 && ly<=0){
+    if (lx > 0 && ly < 0) {
       deg = adeg + Math.PI * 2;
     }
-    return deg / ((this.startDeg - this.endDeg)*Math.PI) * 100
+    return deg
   }
+
   //获取鼠标在canvas内坐标x
   getx(ev) {
     return ev.clientX - this.el.getBoundingClientRect().left;
   }
+
   //获取鼠标在canvas内坐标y
   gety(ev) {
     return ev.clientY - this.el.getBoundingClientRect().top;
   }
+  //节流
   debounce(func) {
     let timeout;
     return function () {
-        let context = this;
-        let args = arguments;
+      let context = this;
+      let args = arguments;
 
-        if (timeout) clearTimeout(timeout);
-        
-        timeout = setTimeout(() => {
-            func.apply(context, args)
-        }, 10);
+      if (timeout) clearTimeout(timeout);
+
+      timeout = setTimeout(() => {
+        func.apply(context, args)
+      }, 10);
     }
   }
 }
