@@ -9,7 +9,7 @@
 class DragAcr {
   constructor(param) {
     this.initParam(param)
-    this.draw(30)
+    this.draw(this.value)
   }
   initParam(param) {
     const {
@@ -25,7 +25,9 @@ class DragAcr {
       slider = 10,
       color = "",
       sliderColor = "#fff",
-      sliderBorderColor = "#f15a4a"
+      sliderBorderColor = "#f15a4a",
+      value = 0,
+      change = (v)=> { console.log(v) },
     } = param;
 
     this.el = el;
@@ -47,6 +49,9 @@ class DragAcr {
     this.color = color;
     this.sliderColor = sliderColor;
     this.sliderBorderColor = sliderBorderColor;
+    this.value = value;
+
+    this.change = change;
 
     this.isDown = false;
     this.event(el)
@@ -59,6 +64,7 @@ class DragAcr {
     this.canvas.setAttribute("height", this.width);
     dom.appendChild(this.canvas);
     this.ctx = this.canvas.getContext("2d");
+    this.isMobile = /Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent);
     //console.log(this.ctx)
   }
   //绘图
@@ -115,7 +121,7 @@ class DragAcr {
   valToDeg(v) {
     let range = this.endDeg - this.startDeg;
     let val = range / 100 * v;
-    if(this.counterclockwise) val = 2 -val;
+    if(this.counterclockwise && (val !=0) ) val = 2 -val;
     let startDeg = this.counterclockwise ? (2 - this.startDeg) : this.startDeg;
     return (startDeg + val) * Math.PI;
   }
@@ -156,25 +162,30 @@ class DragAcr {
     }
   }
   event(dom) {  //事件绑定
+    if(this.isMobile){
+        dom.addEventListener("touchstart", this.OnMouseDown.bind(this), false);
+        dom.addEventListener("touchmove", this.debounce(this.OnMouseMove.bind(this)), false);
+        dom.addEventListener("touchend", this.OnMouseUp.bind(this), false);
+        return
+    }
     dom.addEventListener("mousedown", this.OnMouseDown.bind(this), false);
     dom.addEventListener("mousemove", this.debounce(this.OnMouseMove.bind(this)), false);
     dom.addEventListener("mouseup", this.OnMouseUp.bind(this), false);
   }
-  OnMouseMove(evt) { //
-
+  OnMouseMove(evt) {
     if (!this.isDown) return;
-
-    // console.log('move')
     let evpoint = {};
     evpoint.x = this.getx(evt);
     evpoint.y = this.gety(evt);
     let point = this.spotchangeXY(evpoint);
-    // console.log(point)
     let deg = this.XYToDeg(point.x, point.y);
     deg = this.counterclockwise ? deg : Math.PI * 2 - deg;
     let val = (deg/ Math.PI - this.startDeg) /(this.endDeg - this.startDeg)  * 100
     if(val>100 || val<0) return;
-    this.draw(val)
+    if(Math.abs (val - this.value) > 10) return;
+    this.value = val;
+    this.draw(val);
+    this.change(val)
   }
   OnMouseDown(evt) {
     console.log('down');
@@ -217,12 +228,13 @@ class DragAcr {
 
   //获取鼠标在canvas内坐标x
   getx(ev) {
-    return ev.clientX - this.el.getBoundingClientRect().left;
+    if(!this.isMobile) return ev.clientX - this.el.getBoundingClientRect().left;
+    return ev.touches[0].pageX - this.el.getBoundingClientRect().left;
   }
-
   //获取鼠标在canvas内坐标y
   gety(ev) {
-    return ev.clientY - this.el.getBoundingClientRect().top;
+    if(!this.isMobile) return ev.clientY - this.el.getBoundingClientRect().top;
+    return ev.touches[0].pageY - this.el.getBoundingClientRect().top;
   }
   //节流
   debounce(func) {
