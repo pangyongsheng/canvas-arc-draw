@@ -5,13 +5,13 @@
 
 
 #### Using npm
-npm i dragArc -S
+npm i drag-arc -S
 
 ```
- import DragArc from 'DragArc';
+ import DragArc from 'drag-arc';
 ```
 
-#### 直接引入js
+#### 也可下载直接引入js
 
 ```
 <script src= 'dist/drag-arc.min.js'>
@@ -40,6 +40,7 @@ new DragArc({
 | startDeg | 滑动圆弧的起始弧度 | Number (0-2)| 0 |
 | endDeg | 滑动圆弧的结束弧度 |Number (0-2)| 1 |
 | value | 默认值 | Number (0-100) | 0 | 
+| textShow | 显示文字 | Boolean | true | 
 | innerColor | 内侧弧度的颜色 | String | 
 | outColor | 外侧圆弧背景颜色 | String,Array |
 | innerLineWidth | 内侧弧线宽 | Number | 1 |

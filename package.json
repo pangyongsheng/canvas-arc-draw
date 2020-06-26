@@ -34,5 +34,8 @@
     "rollup-plugin-terser": "^6.1.0",
     "rollup-plugin-uglify-es": "^0.0.1",
     "rollup-pluginutils": "^2.8.2"
+  },
+  "dependencies": {
+    "core-js": "^3.6.5"
   }
 }
