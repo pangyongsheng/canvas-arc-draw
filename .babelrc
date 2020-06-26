@@ -5,13 +5,21 @@
       {
         "modules": false,
         "useBuiltIns": "usage",
-        "corejs": "2.6.10"
+        "corejs": 3
       }
     ]
-    // "stage-3"
   ],
   "plugins": [
-    ["@babel/plugin-transform-runtime"]
+    [
+      "@babel/plugin-transform-runtime",
+      {
+        "corejs": {
+          "version": 3,
+          "proposals": true
+        },
+        "useESModules": true
+      }
+    ]
   ],
   "ignore": [
     "node_modules/**"
