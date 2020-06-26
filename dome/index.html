@@ -19,10 +19,16 @@
 <script src="../dist/drag-arc.min.js"></script>
 <script>
     function main(){
-        console.log(dragArc)
         const dom = document.getElementById("content")
-        const a = new dragArc({
-            el: dom
+        const a = new DragArc({
+            el: dom,
+            startDeg: 0,
+            endDeg: 1,
+            outColor: '#eee',
+            counterclockwise: true,
+            change: (v)=> {
+                console.log(`value:${v}`)
+            }
         })
     }
 </script>

@@ -15,26 +15,26 @@ class DragAcr {
     const {
       el,
       startDeg = 0,
-      endDeg = 1.8,
-      innerColor = "#0078b4",
+      endDeg = 1,
+      innerColor = "#51e6b6",
       outColor = "#c0c0c0",
       innerLineWidth = 1,
       outLineWidth = 20,
       counterclockwise = true,
-      rotate = 0,
       slider = 10,
-      color = "",
+      color = ["#06dabc", "#33aaff"],
       sliderColor = "#fff",
-      sliderBorderColor = "#f15a4a",
+      sliderBorderColor = "#33aaff",
       value = 0,
       change = (v)=> { console.log(v) },
+      textShow = true
     } = param;
 
     this.el = el;
     this.width = el.offsetWidth;
     this.height = el.offsetHeight;
     this.center = this.width / 2
-    this.radius = this.width / 3; //滑动路径半径
+    this.radius = this.width / 2 - 30; //滑动路径半径
     this.initCanvas(el);
 
     this.startDeg = startDeg;
@@ -44,12 +44,13 @@ class DragAcr {
     this.innerLineWidth = innerLineWidth;
     this.outLineWidth = outLineWidth;
     this.counterclockwise = counterclockwise;
-    this.rotate = rotate;
     this.slider = slider;
     this.color = color;
     this.sliderColor = sliderColor;
     this.sliderBorderColor = sliderBorderColor;
     this.value = value;
+    this.textShow = textShow;
+    
 
     this.change = change;
 
@@ -65,7 +66,6 @@ class DragAcr {
     dom.appendChild(this.canvas);
     this.ctx = this.canvas.getContext("2d");
     this.isMobile = /Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent);
-    //console.log(this.ctx)
   }
   //绘图
   draw(value) {
@@ -88,33 +88,41 @@ class DragAcr {
     this.ctx.arc(this.center, this.center, this.radius, startDeg, endDeg, this.counterclockwise); // 绘制外侧圆弧
     this.ctx.strokeStyle = this.outColor;
     this.ctx.lineCap = "round";
-    this.ctx.lineWidth = 20;
+    this.ctx.lineWidth = this.outLineWidth;
     this.ctx.stroke();
 
     let Deg = this.valToDeg(value)
 
-    //console.log(Deg)
 
     // 绘制可变圆弧
+    let themeColor = (typeof this.color == 'String') ? this.color : this.setLinearGradient()
     this.ctx.beginPath();
     this.ctx.arc(this.center, this.center, this.radius, startDeg, Deg, this.counterclockwise); // 可变圆弧
-    this.ctx.strokeStyle = '#f15a4a';
+    this.ctx.strokeStyle =  themeColor;
     this.ctx.lineCap = "round";
-    this.ctx.lineWidth = 20;
+    this.ctx.lineWidth = this.outLineWidth;
     this.ctx.stroke();
 
     // 绘制滑块
     this.P = this.DegToXY(Deg)
     this.ctx.beginPath();
-    this.ctx.moveTo(200, 200);
+    this.ctx.moveTo(this.center, this.center, );
     this.ctx.arc(this.P.x, this.P.y, this.slider + 5, 0, Math.PI * 2, false); // 绘制滑块内侧
     this.ctx.fillStyle = this.sliderBorderColor;
     this.ctx.fill();
     this.ctx.beginPath();
-    this.ctx.moveTo(200, 200);
+    this.ctx.moveTo(this.center, this.center);
     this.ctx.arc(this.P.x, this.P.y, this.slider, 0, Math.PI * 2, false); // 绘制滑块
     this.ctx.fillStyle = this.sliderColor;;
     this.ctx.fill();
+
+    // 文字
+    if(!this.textShow) return;
+    this.ctx.font = `${this.center/4}px serif`;
+    this.ctx.fillStyle = themeColor;
+    this.ctx.textAlign = "center"
+    this.ctx.textBaseline = "bottom";
+    this.ctx.fillText(this.value, this.center, this.center);
 
   }
   //将值转化为弧度
@@ -161,6 +169,21 @@ class DragAcr {
       y: spotchangeY(point.y)
     }
   }
+
+  setLinearGradient(){
+    const grad  = this.ctx.createLinearGradient(0,0, 0,this.width);
+    this.color.forEach((e, i) => {
+        if(i == 0){
+            grad.addColorStop(0, e)
+        }else  if(i == this.color.length - 1){ 
+            grad.addColorStop(1, e)
+        }else{
+            grad.addColorStop(1/this.color.length * (i+1), e);
+        }
+    });
+    return grad;
+  }
+
   event(dom) {  //事件绑定
     if(this.isMobile){
         dom.addEventListener("touchstart", this.OnMouseDown.bind(this), false);
@@ -172,6 +195,7 @@ class DragAcr {
     dom.addEventListener("mousemove", this.debounce(this.OnMouseMove.bind(this)), false);
     dom.addEventListener("mouseup", this.OnMouseUp.bind(this), false);
   }
+
   OnMouseMove(evt) {
     if (!this.isDown) return;
     let evpoint = {};
@@ -180,33 +204,38 @@ class DragAcr {
     let point = this.spotchangeXY(evpoint);
     let deg = this.XYToDeg(point.x, point.y);
     deg = this.counterclockwise ? deg : Math.PI * 2 - deg;
-    let val = (deg/ Math.PI - this.startDeg) /(this.endDeg - this.startDeg)  * 100
-    if(val>100 || val<0) return;
+    let val = (deg/ Math.PI - this.startDeg) / (this.endDeg - this.startDeg)  * 100
+    // if(val>100 || val<0) return;
+    if(val >= 100) val = 100;
+    if(val <= 0) val = 0;
     if(Math.abs (val - this.value) > 10) return;
-    this.value = val;
     this.draw(val);
-    this.change(val)
+    if(this.value != Math.round(val)){
+        this.value = Math.round(val);
+        this.change(this.value)
+    }
   }
+
   OnMouseDown(evt) {
-    console.log('down');
+    let range = 10;
     let X = this.getx(evt);
     let Y = this.gety(evt);
     let P = this.P 
-    // console.log(P)
-    // console.log(X,Y)
-    let minX = P.x - this.slider;
-    let maxX = P.x + this.slider;
-    let minY = P.y - this.slider;
-    let maxY = P.y + this.slider;
+    let minX = P.x - this.slider - range;
+    let maxX = P.x + this.slider + range;
+    let minY = P.y - this.slider - range;
+    let maxY = P.y + this.slider + range;
     if (minX < X && X < maxX && minY < Y && Y < maxY) {   //判断鼠标是否在滑块上 
       this.isDown = true;
     } else {
       this.isDown = false;
     }
   }
+
   OnMouseUp() {  //鼠标释放
     this.isDown = false
   }
+
   // 将坐标点转化为弧度
   XYToDeg(lx, ly) {
     let adeg = Math.atan(ly / lx)
@@ -231,11 +260,13 @@ class DragAcr {
     if(!this.isMobile) return ev.clientX - this.el.getBoundingClientRect().left;
     return ev.touches[0].pageX - this.el.getBoundingClientRect().left;
   }
+
   //获取鼠标在canvas内坐标y
   gety(ev) {
     if(!this.isMobile) return ev.clientY - this.el.getBoundingClientRect().top;
     return ev.touches[0].pageY - this.el.getBoundingClientRect().top;
   }
+  
   //节流
   debounce(func) {
     let timeout;
