@@ -205,6 +205,7 @@ class DragAcr {
     let deg = this.XYToDeg(point.x, point.y);
     deg = this.counterclockwise ? deg : Math.PI * 2 - deg;
     let val = (deg/ Math.PI - this.startDeg) / (this.endDeg - this.startDeg)  * 100
+    if(val<0) val = 100 + val;
     // if(val>100 || val<0) return;
     if(val >= 100) val = 100;
     if(val <= 0) val = 0;
@@ -241,7 +242,7 @@ class DragAcr {
     let adeg = Math.atan(ly / lx)
     let deg;
     if (lx >= 0 && ly >= 0) {
-      deg = adeg;
+      deg = adeg ;
     }
     if (lx <= 0 && ly >= 0) {
       deg = adeg + Math.PI;

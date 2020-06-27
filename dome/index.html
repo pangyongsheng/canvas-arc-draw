@@ -23,14 +23,16 @@
         const dom = document.getElementById("content")
         const a = new DragArc({
             el: dom,
-            startDeg: 0,
-            endDeg: 1,
+            startDeg: 0.5,
+            endDeg: 2.5,
             outColor: '#eee',
-            counterclockwise: true,
+            counterclockwise: false,
             change: (v)=> {
                 console.log(`value:${v}`)
             }
         })
     }
 </script>
+<style>
+</style>
 </html>

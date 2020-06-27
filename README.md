@@ -37,8 +37,8 @@ new DragArc({
 | - | - | - | - | - |
 | el | 放置组件的DOM元素 | Element | none | Y |
 | change|当前值变化时触发的事件，回调参数为当前进度值Number（0-100）| Function | 
-| startDeg | 滑动圆弧的起始弧度 | Number (0-2)| 0 |
-| endDeg | 滑动圆弧的结束弧度 |Number (0-2)| 1 |
+| startDeg | 滑动圆弧的起始弧度 | Number| 0 |
+| endDeg | 滑动圆弧的结束弧度 |Number | 2 |
 | value | 默认值 | Number (0-100) | 0 | 
 | textShow | 显示文字 | Boolean | true | 
 | innerColor | 内侧弧度的颜色 | String | 
