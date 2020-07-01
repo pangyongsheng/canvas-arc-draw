@@ -1,7 +1,7 @@
 <!--
  * @Author       : your name
  * @Date         : 2020-06-22 17:22:25
- * @LastEditTime : 2020-06-23 17:18:37
+ * @LastEditTime : 2020-07-01 10:10:33
  * @LastEditors  : Please set LastEditors
  * @Description  : In User Settings Edit
  * @FilePath     : \drag-arc\dome\index.html
@@ -21,7 +21,7 @@
     
     function main(){
         const dom = document.getElementById("content")
-        const a = new DragArc({
+        new DragArc({
             el: dom,
             startDeg: 0.5,
             endDeg: 2.5,
@@ -34,5 +34,8 @@
     }
 </script>
 <style>
+    #content{
+        width: 500px;
+    }
 </style>
 </html>

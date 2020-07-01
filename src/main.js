@@ -1,7 +1,7 @@
 /*
  * @Author       : pangyongsheng
  * @Date         : 2020-06-22 16:13:50
- * @LastEditTime : 2020-06-24 17:49:59
+ * @LastEditTime : 2020-07-01 10:12:22
  * @LastEditors  : Please set LastEditors
  * @Description  : In User Settings Edit
  * @FilePath     : \drag-arc\src\dragArc.js
@@ -279,7 +279,7 @@ class DragAcr {
 
       timeout = setTimeout(() => {
         func.apply(context, args)
-      }, 10);
+      }, 1);
     }
   }
 }

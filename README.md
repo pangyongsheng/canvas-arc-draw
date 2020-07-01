@@ -1,4 +1,7 @@
+
 # 可拖拽的弧形进度条组件（支持移动端）
+
+这是一个支持任意弧度开始结束，正时针、逆时针，样式可配置的圆形可拖动进度条
 
 
 ## 使用方法
@@ -48,6 +51,9 @@ new DragArc({
 |  counterclockwise | 逆时针方向 | Boolean | true |
 | sliderColor  | 滑块颜色  | String | 
 |  sliderBorderColor | 滑块边框颜色  | String | #fff|
+
+这里startDeg，endDeg 设置为任意数值n,表示表示n *  π, 如示例为 0 和1 ，表示0 到 π ；
+
 
 ## 方法
 
