@@ -1,7 +1,7 @@
 /*
  * @Author       : pangyongsheng
  * @Date         : 2020-06-22 16:13:50
- * @LastEditTime : 2020-07-01 10:12:22
+ * @LastEditTime : 2020-07-03 17:05:25
  * @LastEditors  : Please set LastEditors
  * @Description  : In User Settings Edit
  * @FilePath     : \drag-arc\src\dragArc.js
@@ -187,12 +187,12 @@ class DragAcr {
   event(dom) {  //事件绑定
     if(this.isMobile){
         dom.addEventListener("touchstart", this.OnMouseDown.bind(this), false);
-        dom.addEventListener("touchmove", this.debounce(this.OnMouseMove.bind(this)), false);
+        dom.addEventListener("touchmove", this.throttle(this.OnMouseMove.bind(this)), false);
         dom.addEventListener("touchend", this.OnMouseUp.bind(this), false);
         return
     }
     dom.addEventListener("mousedown", this.OnMouseDown.bind(this), false);
-    dom.addEventListener("mousemove", this.debounce(this.OnMouseMove.bind(this)), false);
+    dom.addEventListener("mousemove", this.throttle(this.OnMouseMove.bind(this)), false);
     dom.addEventListener("mouseup", this.OnMouseUp.bind(this), false);
   }
 
@@ -210,7 +210,7 @@ class DragAcr {
     if(val >= 100) val = 100;
     if(val <= 0) val = 0;
     if(Math.abs (val - this.value) > 10) return;
-    this.draw(val);
+    this.animate = requestAnimationFrame(this.draw.bind(this,val));
     if(this.value != Math.round(val)){
         this.value = Math.round(val);
         this.change(this.value)
@@ -234,6 +234,8 @@ class DragAcr {
   }
 
   OnMouseUp() {  //鼠标释放
+    const _this = this
+    cancelAnimationFrame(_this.animate);
     this.isDown = false
   }
 
@@ -269,17 +271,16 @@ class DragAcr {
   }
   
   //节流
-  debounce(func) {
-    let timeout;
-    return function () {
-      let context = this;
-      let args = arguments;
-
-      if (timeout) clearTimeout(timeout);
-
-      timeout = setTimeout(() => {
-        func.apply(context, args)
-      }, 1);
+  throttle(func) {
+    let previous = 0;
+    return function() {
+        let now = Date.now();
+        let context = this;
+        let args = arguments;
+        if (now - previous > 10) {
+            func.apply(context, args);
+            previous = now;
+        }
     }
   }
 }
