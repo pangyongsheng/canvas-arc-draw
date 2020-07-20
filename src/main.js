@@ -1,7 +1,7 @@
 /*
  * @Author       : pangyongsheng
  * @Date         : 2020-06-22 16:13:50
- * @LastEditTime : 2020-07-20 11:18:37
+ * @LastEditTime : 2020-07-20 14:17:13
  * @LastEditors  : Please set LastEditors
  * @Description  : In User Settings Edit
  * @FilePath     : \drag-arc\src\dragArc.js
@@ -100,6 +100,8 @@ class DragAcr {
 
     let Deg = this.valToDeg(value)
 
+    if(!this.showDrag) return;
+
 
     // 绘制可变圆弧
     let themeColor = (typeof this.color == 'String') ? this.color : this.setLinearGradient()
@@ -110,7 +112,6 @@ class DragAcr {
     this.ctx.lineWidth = this.outLineWidth;
     this.ctx.stroke();
 
-    if(!this.showDrag) return;
     // 绘制滑块
     this.P = this.DegToXY(Deg)
     this.ctx.beginPath();
