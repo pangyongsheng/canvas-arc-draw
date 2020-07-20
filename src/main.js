@@ -1,7 +1,7 @@
 /*
  * @Author       : pangyongsheng
  * @Date         : 2020-06-22 16:13:50
- * @LastEditTime : 2020-07-03 17:05:25
+ * @LastEditTime : 2020-07-20 11:18:37
  * @LastEditors  : Please set LastEditors
  * @Description  : In User Settings Edit
  * @FilePath     : \drag-arc\src\dragArc.js
@@ -19,6 +19,7 @@ class DragAcr {
       innerColor = "#51e6b6",
       outColor = "#c0c0c0",
       innerLineWidth = 1,
+      innerLineDash = false,
       outLineWidth = 20,
       counterclockwise = true,
       slider = 10,
@@ -27,7 +28,9 @@ class DragAcr {
       sliderBorderColor = "#33aaff",
       value = 0,
       change = (v)=> { console.log(v) },
-      textShow = true
+      mouseUp = (v)=> {},
+      textShow = true,
+      showDrag = true,
     } = param;
 
     this.el = el;
@@ -42,6 +45,7 @@ class DragAcr {
     this.innerColor = innerColor;
     this.outColor = outColor;
     this.innerLineWidth = innerLineWidth;
+    this.innerLineDash = innerLineDash;
     this.outLineWidth = outLineWidth;
     this.counterclockwise = counterclockwise;
     this.slider = slider;
@@ -50,9 +54,10 @@ class DragAcr {
     this.sliderBorderColor = sliderBorderColor;
     this.value = value;
     this.textShow = textShow;
+    this.showDrag = showDrag;
     
-
     this.change = change;
+    this.mouseUp = mouseUp;
 
     this.isDown = false;
     this.event(el)
@@ -78,6 +83,7 @@ class DragAcr {
 
     // 绘制内层圆弧
     this.ctx.beginPath();
+    this.innerLineDash && this.ctx.setLineDash([this.innerLineDash,this.innerLineDash]);
     this.ctx.lineWidth = 1;
     this.ctx.arc(this.center, this.center, this.radius - 20, startDeg, endDeg, this.counterclockwise); // 绘制内层圆弧
     this.ctx.strokeStyle = this.innerColor;
@@ -85,6 +91,7 @@ class DragAcr {
 
     // 绘制外侧圆弧
     this.ctx.beginPath();
+    this.innerLineDash && this.ctx.setLineDash([1,0])
     this.ctx.arc(this.center, this.center, this.radius, startDeg, endDeg, this.counterclockwise); // 绘制外侧圆弧
     this.ctx.strokeStyle = this.outColor;
     this.ctx.lineCap = "round";
@@ -103,6 +110,7 @@ class DragAcr {
     this.ctx.lineWidth = this.outLineWidth;
     this.ctx.stroke();
 
+    if(!this.showDrag) return;
     // 绘制滑块
     this.P = this.DegToXY(Deg)
     this.ctx.beginPath();
@@ -235,6 +243,7 @@ class DragAcr {
 
   OnMouseUp() {  //鼠标释放
     const _this = this
+    this.mouseUp();
     cancelAnimationFrame(_this.animate);
     this.isDown = false
   }

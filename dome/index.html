@@ -1,7 +1,7 @@
 <!--
  * @Author       : your name
  * @Date         : 2020-06-22 17:22:25
- * @LastEditTime : 2020-07-01 10:10:33
+ * @LastEditTime : 2020-07-20 11:20:28
  * @LastEditors  : Please set LastEditors
  * @Description  : In User Settings Edit
  * @FilePath     : \drag-arc\dome\index.html
@@ -27,8 +27,12 @@
             endDeg: 2.5,
             outColor: '#eee',
             counterclockwise: false,
+            innerLineDash: 15,
             change: (v)=> {
                 console.log(`value:${v}`)
+            },
+            mouseUp: ()=> {
+                console.log(999)
             }
         })
     }
