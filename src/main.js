@@ -42,6 +42,7 @@ class DragAcr {
 
     this.startDeg = startDeg;
     this.endDeg = endDeg;
+    this.residueDeg = 2 - startDeg;
     this.innerColor = innerColor;
     this.outColor = outColor;
     this.innerLineWidth = innerLineWidth;
@@ -213,8 +214,12 @@ class DragAcr {
     let point = this.spotchangeXY(evpoint);
     let deg = this.XYToDeg(point.x, point.y);
     deg = this.counterclockwise ? deg : Math.PI * 2 - deg;
-    let val = (deg/ Math.PI - this.startDeg) / (this.endDeg - this.startDeg)  * 100
-    if(val<0) val = 100 + val;
+    const radian = deg / Math.PI;
+    let val =
+			((radian - (radian > this.startDeg ? this.startDeg : -this.residueDeg)) /
+				(this.endDeg - this.startDeg)) *
+			100;
+
     // if(val>100 || val<0) return;
     if(val >= 100) val = 100;
     if(val <= 0) val = 0;
