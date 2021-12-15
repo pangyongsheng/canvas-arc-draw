@@ -1,6 +1,6 @@
 {
   "name": "drag-arc",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "可拖拽的园弧形进度条组件（支持移动端）",
   "main": "dist/drag-arc.umd.js",
   "module": "dist/drag-arc.esm.js",
